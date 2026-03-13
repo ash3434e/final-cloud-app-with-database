@@ -36,19 +36,40 @@
 </nav>
 
 <div class="container-fluid">
-    {% if grade > 80 %}
+    {% if score >= 80 %}
     <div class="alert alert-success">
-       <!--HINT Display passed info -->
+       <h4 class="alert-heading">Congratulations!</h4>
+       <p>You have passed the exam with a score of {{ score }}/100.</p>
     </div>
         {% else %}
         <div class="alert alert-danger">
-            <!--HINT Display failed info -->
+            <h4 class="alert-heading">Exam Failed</h4>
+            <p>You scored {{ score }}/100. Please review the course material and try again.</p>
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
         <div class="card-columns-vertical mt-1">
-        <h5 class="">Exam results</h5>
-            <!--HINT Display exam results-->
+        <h5 class="">Exam results for {{ course.name }}</h5>
+            {% for question in course.question_set.all %}
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h5>{{ question.content }}</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for choice in question.choice_set.all %}
+                        <li class="list-group-item 
+                            {% if choice.is_correct %} list-group-item-success {% endif %}
+                            {% if choice in submission.choices.all and not choice.is_correct %} list-group-item-danger {% endif %}">
+                            {{ choice.content }}
+                            {% if choice.is_correct %} (Correct Answer) {% endif %}
+                            {% if choice in submission.choices.all %} (Your Selection) {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </body>
